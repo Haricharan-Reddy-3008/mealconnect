@@ -1,19 +1,13 @@
 import { useEffect, useState } from "react";
+import { Cookie } from "lucide-react";
 
 const CookieConsent = () => {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(
+    () => !localStorage.getItem("cookie_consent"),
+  );
 
   useEffect(() => {
-    const consent = localStorage.getItem("cookie_consent");
-    if (!consent) {
-      setShow(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (show) {
-      document.body.style.overflow = "hidden";
-    }
+    document.body.style.overflow = show ? "hidden" : "auto";
     return () => {
       document.body.style.overflow = "auto";
     };
@@ -28,41 +22,43 @@ const CookieConsent = () => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/65"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4"
       role="dialog"
       aria-modal="true"
     >
-      <div className="flex flex-col items-center w-[23vw] max-md:w-[80vw] bg-white text-gray-500 p-4 md:p-6 rounded-lg border border-gray-500/30 text-sm">
-        <div className="flex items-center justify-center relative w-full gap-2 pb-3">
-          <img
-            className="absolute -top-10 md:-top-12"
-            src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/cookies/cookieImage2.svg"
-            alt="Cookies"
-          />
-          <h1 className="text-gray-800 text-2xl font-medium w-full pt-3">
-            Your privacy is important to us
-          </h1>
+      <div className="w-full max-w-sm bg-[#1e293b] border border-white/10 rounded-2xl p-6 shadow-2xl">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-9 h-9 rounded-xl bg-orange-500/15 border border-orange-500/25 flex items-center justify-center flex-shrink-0">
+            <Cookie size={17} className="text-orange-400" />
+          </div>
+          <h2 className="text-white font-bold text-base">We use cookies</h2>
         </div>
 
-        <p>
-          We process your personal information to measure and improve our sites
-          and services, to assist our campaigns and to provide personalised
-          content. For more information see our{" "}
-          <a href="#" className="font-medium underline">
+        <p className="text-slate-400 text-sm leading-relaxed">
+          We use cookies to improve your experience, personalize content, and
+          measure platform performance. See our{" "}
+          <a
+            href="#"
+            className="text-orange-400 underline hover:text-orange-300 transition-colors"
+          >
             Privacy Policy
-          </a>.
+          </a>{" "}
+          for details.
         </p>
 
-        <div className="flex items-center justify-between mt-6 gap-3 w-full">
-          <a className="underline" href="#">
-            More Option
+        <div className="flex items-center gap-3 mt-5">
+          <a
+            href="#"
+            className="text-sm text-slate-400 hover:text-slate-300 transition-colors underline"
+          >
+            More Options
           </a>
           <button
             type="button"
-            className="bg-[#aacd41] px-6 py-2 rounded text-white font-medium active:scale-95 transition cursor-pointer"
             onClick={handleAccept}
+            className="ml-auto px-5 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white text-sm font-semibold hover:shadow-lg hover:shadow-orange-500/25 transition-all cursor-pointer"
           >
-            Accept
+            Accept All
           </button>
         </div>
       </div>

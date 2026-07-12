@@ -1,0 +1,10 @@
+import { useRef, useState } from "react";
+import { ImagePlus, X } from "lucide-react";
+import { uploadDistributionProof } from "../api/food";
+import toast from "react-hot-toast";
+
+export default function DistributionProofModal({ food, onClose, onDone }) {
+  const input = useRef(); const [files, setFiles] = useState([]); const [saving, setSaving] = useState(false);
+  const submit = async () => { if (!files.length) return toast.error("Add at least one distribution photo"); const body = new FormData(); files.forEach((file) => body.append("photos", file)); setSaving(true); try { await uploadDistributionProof(food._id, body); toast.success("Photos uploaded. You can now mark this collected."); onDone(); onClose(); } catch (e) { toast.error(e.response?.data?.message || "Upload failed"); } finally { setSaving(false); } };
+  return <div className="fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-4"><div className="w-full max-w-md rounded-2xl bg-[#1e293b] border border-white/10 p-6 relative"><button onClick={onClose} className="absolute top-4 right-4 text-slate-400"><X size={18}/></button><h2 className="text-xl font-bold text-white">Show the impact</h2><p className="mt-2 text-sm text-slate-400">Upload photos of the food being distributed. They become part of the protected audit trail.</p><input ref={input} type="file" accept="image/jpeg,image/png" multiple className="hidden" onChange={(e) => setFiles(Array.from(e.target.files || []))}/><button onClick={() => input.current?.click()} className="mt-5 w-full py-8 border border-dashed border-white/20 rounded-xl text-slate-300 text-sm"><ImagePlus className="mx-auto mb-2 text-sky-400"/>Choose photos</button><p className="text-xs text-slate-400 mt-2">{files.length ? `${files.length} photo(s) ready` : "JPG or PNG, maximum five photos"}</p><button onClick={submit} disabled={saving} className="mt-5 w-full py-3 rounded-xl bg-sky-500 text-white font-semibold text-sm disabled:opacity-50">{saving ? "Uploading…" : "Upload distribution photos"}</button></div></div>;
+}

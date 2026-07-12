@@ -1,29 +1,39 @@
-import React, { useState } from 'react'
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import React from "react";
+import { useAuth } from "../context/useAuth";
+import { useNavigate } from "react-router-dom";
+import { UserCog, LogOut, ShieldCheck } from "lucide-react";
 
 const Menu = () => {
-    const { logout } = useAuth();
-    const navigate = useNavigate();
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
 
-    return (
-        <div className="text-sm w-40 p-3 bg-white border border-gray-500/30 text-gray-800/80 rounded-md font-medium">
-            <ul className="flex flex-col gap-px">
-                <li className="flex items-center justify-between gap-2 cursor-pointer px-1 py-1 rounded hover:bg-gray-500/20 transition" onClick={() => {navigate("/updateprofile");scrollTo(0,0)}}>
-                    <a href="#" className="-mr-px">Edit Profile</a>
-                    <svg width="25" height="25" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14.672 6.763 5.58 15.854l-.166 2.995 2.995-.166L17.5 9.59m-2.828-2.828 1.348-1.349a2 2 0 1 1 2.829 2.829L17.5 9.59m-2.828-2.828L17.5 9.591" stroke="#1F2937" strokeWidth=".96" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                </li>
-                <div className="w-full h-px bg-gray-300/70 my-2"></div>
-                <li className="flex items-center text-red-600/80 justify-between gap-3 cursor-pointer px-1 py-2 rounded hover:bg-red-600/20 transition" onClick={() => {logout();navigate("/");scrollTo(0,0)}}>
-                    <p>Log out</p>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-log-out-icon lucide-log-out"><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /></svg>
-                </li>
-            </ul>
-        </div>
-    );
-}
+  return (
+    <div className="w-44 bg-[#1e293b] border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden py-1.5">
+      <button
+        onClick={() => {
+          navigate("/updateprofile");
+          scrollTo(0, 0);
+        }}
+        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/8 hover:text-orange-400 transition-all cursor-pointer"
+      >
+        <UserCog size={15} className="flex-shrink-0" />
+        Edit Profile
+      </button>
+      {user?.isAdmin && <button onClick={() => { navigate("/admin"); scrollTo(0, 0); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-sky-300 hover:bg-white/8"><ShieldCheck size={15}/>Admin dashboard</button>}
+      <div className="mx-3 my-1 h-px bg-white/8" />
+      <button
+        onClick={() => {
+          logout();
+          navigate("/");
+          scrollTo(0, 0);
+        }}
+        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-all cursor-pointer"
+      >
+        <LogOut size={15} className="flex-shrink-0" />
+        Log Out
+      </button>
+    </div>
+  );
+};
 
-export default Menu
+export default Menu;

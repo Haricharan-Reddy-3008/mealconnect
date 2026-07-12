@@ -1,11 +1,9 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import toast from "react-hot-toast";
 import { connectSocket, disconnectSocket } from "../socket/socket";
-
-const AuthContext = createContext();
-export const useAuth = () => useContext(AuthContext);
+import { AuthContext } from "./authContext";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -14,13 +12,10 @@ export const AuthProvider = ({ children }) => {
 
   // CONNECT SOCKET ONCE (APP LEVEL)
   useEffect(() => {
-    
     connectSocket();
 
-    
     // Cleanup on unmount
     return () => {
-     
       disconnectSocket();
     };
   }, []);
@@ -47,7 +42,7 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post(
         "/auth/login",
         { email, password },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       toast.success(res.data.message);
@@ -55,7 +50,7 @@ export const AuthProvider = ({ children }) => {
       const profile = await api.get("/users/me");
       setUser(profile.data);
 
-      navigate("/");
+      navigate(profile.data.isAdmin ? "/admin" : profile.data.verificationStatus === "verified" ? "/" : "/verification");
       return { success: true };
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");

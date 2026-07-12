@@ -1,36 +1,43 @@
-import React from 'react'
+import React from "react";
 
 const Features = (props) => {
   const [tilt, setTilt] = React.useState({ x: 0, y: 0 });
+  const threshold = 10;
 
-    // Adjust the threshold value to control the tilt effect
-    const threshold = 12;
+  const handleMove = (e) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - left) / width - 0.5;
+    const y = (e.clientY - top) / height - 0.5;
+    setTilt({ x: y * -threshold, y: x * threshold });
+  };
 
-    const handleMove = (e) => {
-        const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-        const x = (e.clientX - left) / width - 0.5;
-        const y = (e.clientY - top) / height - 0.5;
-        setTilt({ x: y * -threshold, y: x * threshold });
-    };
-    return (
-        <div className="rounded-xl shadow-xl overflow-hidden transition-transform duration-200 ease-out cursor-pointer max-w-100 max-h-100 bg-gray-100"
-            onMouseMove={handleMove}
-            onMouseLeave={() => setTilt({ x: 0, y: 0 })}
-            style={{ transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}
-        >
-            <img src={props.img}
-                alt={props.name} className="w-full h-52 object-cover"
-            />
-            <h3 className="mt-3 px-4 pt-3 mb-1 text-2xl font-bold text-gray-800">
-                {props.title}
-            </h3>
-            <p className="px-4 pb-2 text-gray-600 w-5/6">
-                {props.body}
-            </p>
-            <button className="px-4 py-2 mb-6 mx-4 bg-[#a4d511] rounded-full text-sm cursor-pointer hover:bg-gray-200 transition all duration-700">know more</button>
-        </div>
+  return (
+    <div
+      className="group rounded-2xl overflow-hidden bg-[#1e293b] border border-white/8 shadow-xl cursor-pointer transition-all duration-200 ease-out hover:border-orange-500/40 hover:shadow-orange-500/10"
+      onMouseMove={handleMove}
+      onMouseLeave={() => setTilt({ x: 0, y: 0 })}
+      style={{
+        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+      }}
+    >
+      <div className="relative overflow-hidden h-52">
+        <img
+          src={props.img}
+          alt={props.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1e293b] via-transparent to-transparent" />
+      </div>
 
-    );
-}
+      <div className="p-5">
+        <h3 className="text-lg font-bold text-white mb-2">{props.title}</h3>
+        <p className="text-slate-400 text-sm leading-relaxed">{props.body}</p>
+        <button className="mt-4 text-xs font-semibold text-orange-400 hover:text-orange-300 transition-colors flex items-center gap-1">
+          Learn more →
+        </button>
+      </div>
+    </div>
+  );
+};
 
-export default Features
+export default Features;

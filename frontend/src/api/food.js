@@ -21,15 +21,15 @@ export const updateFood = (foodId, formData) => {
 
 // delete food post (restaurant owner)
 export const deleteFood = (foodId) => {
-  return api.delete(`/food/food/${foodId}`);
+  return api.delete(`/food/${foodId}`);
 };
 
 export const claimedFoodPosts = () => {
-  return api.get("/food/claimed");
+  return api.get("/food/mine/claimed");
 }
 
 export const getNearbyFoods = async (radius_km = 5) => {
-  const res = await api.get(`/food/nearby?radius_km=${radius_km}`);
+  const res = await api.get(`/food/nearby/search?radius_km=${radius_km}`);
   return res.data
 };
 
@@ -38,3 +38,10 @@ export const claimFood = (id) =>
 
 export const collectFood = (id) =>
   api.patch(`/food/${id}/collected`);
+
+export const startTransit = (id) => api.patch(`/food/${id}/in-transit`);
+
+export const uploadDistributionProof = (id, formData) =>
+  api.post(`/food/${id}/distribution-proof`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });

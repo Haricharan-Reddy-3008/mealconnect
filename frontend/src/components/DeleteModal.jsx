@@ -1,46 +1,38 @@
-import React from 'react'
+import React from "react";
+import { AlertTriangle } from "lucide-react";
 
 const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
-      <div className="flex flex-col items-center bg-white shadow-md rounded-xl py-6 px-5 w-[75vw] md:w-[25vw] border border-gray-200">
-        
-        <div className="flex items-center justify-center p-4 bg-red-100 rounded-full">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M2.875 5.75h1.917m0 0h15.333m-15.333 0v13.417a1.917 1.917 0 0 0 1.916 1.916h9.584a1.917 1.917 0 0 0 1.916-1.916V5.75m-10.541 0V3.833a1.917 1.917 0 0 1 1.916-1.916h3.834a1.917 1.917 0 0 1 1.916 1.916V5.75m-5.75 4.792v5.75m3.834-5.75v5.75"
-              stroke="#DC2626"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm">
+      <div className="flex flex-col items-center bg-[#1e293b] border border-white/10 rounded-2xl py-8 px-6 w-[85vw] md:w-[380px] shadow-2xl">
+
+        {/* Icon */}
+        <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-red-500/15 border border-red-500/25 mb-4">
+          <AlertTriangle size={26} className="text-red-400" />
         </div>
 
-        <h2 className="text-gray-900 font-semibold mt-4 text-xl">Are you sure?</h2>
+        <h2 className="text-white font-bold text-xl">Are you sure?</h2>
 
-        <p className="text-sm text-gray-600 mt-2 text-center">
-          Do you really want to continue? <br /> This action cannot be undone.
+        <p className="text-sm text-slate-400 mt-2 text-center leading-relaxed">
+          This action is <span className="text-red-400 font-medium">permanent</span> and cannot be undone.
         </p>
 
-        <div className="flex items-center justify-center gap-4 mt-5 w-full">
+        <div className="flex items-center gap-3 mt-7 w-full">
           <button
             onClick={onClose}
-            className="w-full md:w-36 h-10 rounded-md border border-gray-300 bg-white text-gray-600 font-medium text-sm hover:bg-gray-100 active:scale-95 transition cursor-pointer"
+            className="flex-1 h-11 rounded-xl border border-white/10 bg-white/5 text-slate-300 text-sm font-medium hover:bg-white/10 transition-all cursor-pointer"
           >
             Cancel
           </button>
-
           <button
             onClick={onConfirm}
-            className="w-full md:w-36 h-10 rounded-md text-white bg-red-600 font-medium text-sm hover:bg-red-700 active:scale-95 transition cursor-pointer"
+            className="flex-1 h-11 rounded-xl bg-red-500/90 text-white text-sm font-semibold hover:bg-red-500 hover:shadow-lg hover:shadow-red-500/20 transition-all cursor-pointer"
           >
-            Confirm
+            Delete
           </button>
         </div>
-
       </div>
     </div>
   );

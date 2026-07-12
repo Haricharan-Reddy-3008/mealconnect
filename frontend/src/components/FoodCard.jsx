@@ -1,72 +1,15 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Clock, Package, MapPin, Truck, Star } from "lucide-react";
 import { useState } from "react";
 import DeleteModal from "./DeleteModal";
+import ClaimantDetails from "./ClaimantDetails";
+import RatingModal from "./RatingModal";
+import { startTransit } from "../api/food";
+import toast from "react-hot-toast";
 
-const FoodCard = ({ food = {}, onDelete, onEdit }) => {
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+const labels = { available: "Available", claim_requested: "Pending Admin Approval", claimed: "Claimed", in_transit: "Pickup in progress", collected: "Collected", expired: "Expired" };
+export default function FoodCard({ food = {}, onDelete, onEdit, refresh }) {
+  const [deleting, setDeleting] = useState(false); const [rating, setRating] = useState(false);
+  const transit = async () => { try { await startTransit(food._id); toast.success("Pickup marked in transit"); refresh?.(); } catch (e) { toast.error(e.response?.data?.message || "Could not update pickup"); } };
   const status = food.status || "available";
-
-  const statusColor = {
-    available: "text-green-600",
-    claimed: "text-yellow-600",
-    collected: "text-gray-500",
-    expired: "text-red-600",
-  };
-
-  const color = statusColor[status] || "text-gray-500";
-
-  return (
-    <div className="p-4 bg-white rounded-lg shadow-xl shadow-[#515739] text-sm max-w-90 max-md:m-auto">
-      <img className="rounded-md max-h-60 w-full object-cover" src={food.food_image?.[0]?.url ||
-        "https://via.placeholder.com/400x300?text=Food+Image"} alt={food.food_name || "Food image"} />
-      <h3 className="text-gray-900 text-2xl font-semibold ml-1 mt-2">{food.food_name || "Unnamed Food"}</h3>
-      <p className="text-gray-500 mt-1.5 ml-1 text-sm">{food.description || "No description"}</p>
-      <div className="space-y-2.5 pl-1 pt-2">
-        <p><b>Quantity :</b> {food.quantity || "Not specified"}</p>
-        <p>
-          <b>Expiry :</b>{" "}
-          {food.expiry_time
-            ? new Date(food.expiry_time).toLocaleString("en-GB", {
-              timeZone: "UTC",
-              year: "numeric",
-              month: "short",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: true,
-            })
-            : "Not specified"}
-        </p>
-        <p>
-          <b>Status :</b>{" "}
-          <span className={color}>
-            {food.status.charAt(0).toUpperCase() + food.status.slice(1)}
-          </span>
-        </p>
-      </div>
-      <div className="flex gap-3 mt-3">
-        <button disabled={food.status !== "available"}
-          onClick={() => { onEdit(food), scrollTo(0, 0) }}
-          className="flex-1 flex items-center justify-center gap-2 border rounded-lg py-2 hover:bg-gray-50 ml-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <Pencil size={16} /> Edit
-        </button>
-
-        <button disabled={food.status !== "available"}
-          onClick={() => { setShowDeleteModal(true) }}
-          className="flex-1 flex items-center justify-center gap-2 bg-red-600 text-white rounded-lg py-2 hover:bg-red-500 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <Trash2 size={16} /> Delete
-        </button>
-
-        <DeleteModal
-          isOpen={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
-          onConfirm={() => onDelete(food._id)}
-        />
-      </div>
-    </div>
-  );
-};
-
-export default FoodCard;
+  return <article className="bg-[#1e293b] border border-white/8 rounded-2xl overflow-hidden shadow-xl flex flex-col"><div className="relative h-48"><img className="w-full h-full object-cover" src={food.food_image?.[0]?.url} alt={food.food_name}/><span className="absolute top-3 right-3 text-xs px-2.5 py-1 rounded-full bg-black/60 text-white">{labels[status]}</span></div><div className="p-4 flex-1"><h3 className="text-white font-bold text-lg">{food.food_name}</h3><p className="text-slate-400 text-xs mt-1 line-clamp-2">{food.description}</p><div className="mt-3 space-y-1.5 text-xs text-slate-400"><p className="flex gap-1.5"><Package size={12} className="text-orange-400"/>{food.quantity}</p><p className="flex gap-1.5"><MapPin size={12} className="text-orange-400"/>{food.city}</p><p className="flex gap-1.5"><Clock size={12} className="text-orange-400"/>Expires {new Date(food.expiry_time).toLocaleString("en-IN")}</p></div>{status !== "available" && <ClaimantDetails ngo={food.claimedBy}/>} {status === "claimed" && <button onClick={transit} className="mt-3 w-full py-2.5 rounded-xl bg-sky-500 text-white text-sm font-semibold flex justify-center gap-2"><Truck size={15}/> Confirm NGO pickup</button>}{status === "collected" && food.claimedBy && <button onClick={() => setRating(true)} className="mt-3 w-full text-amber-300 text-sm flex justify-center gap-2"><Star size={15}/> Rate NGO</button>}<div className="flex gap-2 mt-3 pt-3 border-t border-white/8"><button disabled={status !== "available"} onClick={() => onEdit(food)} className="flex-1 py-2 rounded-lg border border-white/10 text-slate-300 text-xs disabled:opacity-30"><Pencil size={13} className="inline mr-1"/>Edit</button><button disabled={status !== "available"} onClick={() => setDeleting(true)} className="flex-1 py-2 rounded-lg bg-red-500/15 text-red-400 text-xs disabled:opacity-30"><Trash2 size={13} className="inline mr-1"/>Delete</button></div></div><DeleteModal isOpen={deleting} onClose={() => setDeleting(false)} onConfirm={() => onDelete(food._id)}/>{rating && <RatingModal food={food} user={food.claimedBy} onClose={() => setRating(false)} onDone={refresh}/>}</article>;
+}

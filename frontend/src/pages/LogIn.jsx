@@ -1,69 +1,136 @@
-import React, { useState } from 'react'
-import logo from "../assets/logo.png";
-import { useAuth } from "../context/AuthContext";
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Utensils, Mail, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { useAuth } from "../context/useAuth";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const LogIn = () => {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    })
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showPass, setShowPass] = useState(false);
+  const [adminMode, setAdminMode] = useState(false);
+  const { login, loading } = useAuth();
 
-    const { login, loading } = useAuth();
-
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       await login(formData);
-
-    } catch (err) {
+    } catch {
       toast.error("Login failed. Please try again.");
-      console.error(err);
     }
   };
 
-    const handleChange = (e) => {
-        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
-    }
+  const handleChange = (e) =>
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-    return (
-        <div className="min-h-screen bg-gray-50 pt-20">
-            <div className="flex items-center justify-center min-h-[80vh] px-2">
-                <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl shadow-[#515739] p-8 my-15 max-md:mt-3 grid grid-cols-1 md:grid-cols-2 gap-6 border-[#b0e510]">
-                    <div className="flex flex-col gap-4">
-                        <div className="flex items-center gap-3">
-                            <img src={logo} alt="LOGO" className="w-20 h-auto" />
-                            <div>
-                                <h2 className="font-bold text-2xl">Log in to your account</h2>
-                            </div>
-                        </div>
-                        <div className="text-l text-slate-600">Once logged in, you’ll be able to manage posts, share surplus food, or collect meals from nearby partners.</div>
-                    </div>
+  return (
+    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center px-4 pt-20">
+      {/* Glow blob */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-orange-600/10 blur-[120px] pointer-events-none" />
 
-                    <form onSubmit={handleSubmit} className="w-full text-center border border-gray-300/40 rounded-2xl px-5 bg-white shadow-md shadow-[#515739]">
-                        <h1 className="text-gray-900 text-3xl mt-5 font-medium">Login</h1>
-                        <p className="text-gray-500 text-sm mt-2">Please log in to continue</p>
-                        <div className="flex items-center w-full mt-4 bg-white border border-gray-300/80 h-12 rounded-full overflow-hidden pl-5 max-md:pl-2 gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-mail-icon lucide-mail"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /><rect x="2" y="4" width="20" height="16" rx="2" /></svg>
-                            <input type="email" name="email" placeholder="Email id" className="border-none outline-none" value={formData.email} onChange={handleChange} required />
-                        </div>
-                        <div className="flex items-center mt-4 w-full bg-white border border-gray-300/80 h-12 rounded-full overflow-hidden pl-5 max-md:pl-2 gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-lock-icon lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                            <input type="password" name="password" placeholder="Password" className="border-none outline-none ring-0" value={formData.password} onChange={handleChange} required />
-                        </div>
-                        <div className="mt-4 text-left text-[#9fc235]">
-                            <button className="text-sm pl-2" type="button">Forget password?</button>
-                        </div>
-                        <button type="submit" className="mt-2 w-full h-11 rounded-full text-white bg-[#9fc235] hover:opacity-90 cursor-pointer transition-opacity" onClick={() => scrollTo(0,0)}>{loading ? "Logging in..." : "Log in"}
-                        </button>
-                        <p className="text-gray-500 text-sm mt-3 mb-11 text-center">"Don't have an account?"<Link to="/signup" className="text-[#9fc235] hover:underline" onClick={() => scrollTo(0,0)}> Sign up</Link></p>
-                    </form>
-                </div>
+      <div className="relative w-full max-w-md">
+        {/* Card */}
+        <div className="bg-[#1e293b] border border-white/10 rounded-2xl p-8 shadow-2xl">
+          {/* Logo */}
+          <div className="flex items-center gap-2.5 mb-8">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-md">
+              <Utensils size={20} className="text-white" />
             </div>
-        </div>
-    )
-}
+            <span className="text-xl font-bold text-white tracking-tight">
+              Meal<span className="text-orange-400">Connect</span>
+            </span>
+          </div>
 
-export default LogIn
+          <h1 className="text-2xl font-extrabold text-white">Welcome back</h1>
+          <p className="text-slate-400 text-sm mt-1 mb-8">
+            {adminMode ? "Sign in to the protected administration dashboard." : "Sign in to manage your food posts and partnerships."}
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email */}
+            <div>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Email address
+              </label>
+              <div className="mt-1.5 flex items-center gap-3 bg-[#0f172a] border border-white/10 rounded-xl px-4 h-12 focus-within:border-orange-500/60 transition-colors">
+                <Mail size={15} className="text-slate-500 flex-shrink-0" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="you@example.com"
+                  className="bg-transparent outline-none text-white text-sm flex-1 placeholder:text-slate-600"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                Password
+              </label>
+              <div className="mt-1.5 flex items-center gap-3 bg-[#0f172a] border border-white/10 rounded-xl px-4 h-12 focus-within:border-orange-500/60 transition-colors">
+                <Lock size={15} className="text-slate-500 flex-shrink-0" />
+                <input
+                  type={showPass ? "text" : "password"}
+                  name="password"
+                  placeholder="Your password"
+                  className="bg-transparent outline-none text-white text-sm flex-1 placeholder:text-slate-600"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPass((p) => !p)}
+                  className="text-slate-500 hover:text-slate-300 transition-colors"
+                >
+                  {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="text-right">
+              <button
+                type="button"
+                className="text-xs text-orange-400 hover:text-orange-300 transition-colors"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full h-12 rounded-xl text-white font-semibold text-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:shadow-lg hover:shadow-orange-500/30 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer disabled:opacity-60"
+              disabled={loading}
+            >
+              {loading ? "Signing in…" : "Sign In"}
+            </button>
+          </form>
+
+          <button
+            type="button"
+            onClick={() => setAdminMode((value) => !value)}
+            className="mt-5 w-full flex items-center justify-center gap-2 text-sm text-sky-300 hover:text-sky-200"
+          >
+            <ShieldCheck size={16} /> {adminMode ? "Use member login" : "Admin login"}
+          </button>
+
+          {!adminMode && <p className="text-slate-400 text-sm text-center mt-6">
+            New to MealConnect?{" "}
+            <Link
+              to="/signup"
+              onClick={() => scrollTo(0, 0)}
+              className="text-orange-400 hover:text-orange-300 font-medium transition-colors"
+            >
+              Create an account
+            </Link>
+          </p>}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LogIn;

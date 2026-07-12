@@ -1,112 +1,110 @@
 import { claimFood } from "../api/food";
-import { X } from "lucide-react";
+import { X, Clock, Package, MapPin, CheckCircle2 } from "lucide-react";
 import React from "react";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/useAuth";
+
+const statusConfig = {
+  available: { label: "Available", cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" },
+  claimed:   { label: "Claimed",   cls: "bg-amber-500/15  text-amber-400  border-amber-500/30"   },
+  collected: { label: "Collected", cls: "bg-sky-500/15    text-sky-400    border-sky-500/30"     },
+  expired:   { label: "Expired",   cls: "bg-red-500/15    text-red-400    border-red-500/30"     },
+};
 
 const MapFoodModal = ({ food, onClose, refresh }) => {
+  const { user } = useAuth();
+  const isVerified = user?.verificationStatus === "verified";
+
   const handleClaim = async () => {
-    await claimFood(food._id);
-    toast.success(`"${food.food_name} is claimed successfully"`);
-    refresh();
-    onClose();
+    try {
+      await claimFood(food._id);
+      toast.success(`"${food.food_name}" claimed successfully!`);
+      refresh();
+      onClose();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Claim failed");
+    }
   };
 
   const formatToIST = (iso) => {
-    if (!iso) return "";
-
-    const date = new Date(iso);
-
-    return date.toLocaleString("en-IN", {
-      timeZone: "Asia/Kolkata",
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
+    if (!iso) return "Not specified";
+    return new Date(iso).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata", day: "2-digit", month: "short",
+      year: "numeric", hour: "numeric", minute: "2-digit", hour12: true,
     });
   };
 
+  const status = food.status || "available";
+  const cfg = statusConfig[status] || statusConfig.available;
+
   return (
-    <div className="fixed inset-0 bg-black/60 z-20 flex items-center justify-center p-4">
-      <div className="
-        bg-white
-        w-full max-w-md
-        rounded-xl
-        shadow-xl
-        overflow-hidden
-        p-2
-        my-5
-      ">
-        {/* Header */}
-        <div className="flex items-center justify-between m-3">
-          <h2 className="text-lg font-semibold text-gray-800">
-            Food Details
-          </h2>
-          <X
-            className="cursor-pointer text-gray-600 hover:text-gray-900"
-            onClick={onClose}
-          />
-        </div>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-20 flex items-center justify-center p-4">
+      <div className="bg-[#1e293b] border border-white/10 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
 
         {/* Image */}
-        <div className="w-full h-48 sm:h-52 overflow-hidden px-3">
+        <div className="relative w-full h-48 overflow-hidden">
           <img
-            src={
-              food.food_image?.[0]?.url ||
-              "https://via.placeholder.com/400x300?text=Food+Image"
-            }
+            src={food.food_image?.[0]?.url || "https://via.placeholder.com/400x300?text=Food+Image"}
             alt={food.food_name}
-            className="w-full h-full object-cover rounded-lg"
+            className="w-full h-full object-cover"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1e293b] via-transparent to-transparent" />
+
+          {/* Status badge */}
+          <span className={`absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full border ${cfg.cls}`}>
+            {cfg.label}
+          </span>
+
+          {/* Close */}
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-all cursor-pointer"
+          >
+            <X size={15} />
+          </button>
         </div>
 
         {/* Content */}
-        <div className="py-4 px-3 space-y-2">
-          <h3 className="text-gray-900 text-2xl font-semibold">
-            {food.food_name}
-          </h3>
+        <div className="p-5 space-y-3">
+          <h2 className="text-white font-bold text-xl">{food.food_name}</h2>
 
-          <p className="text-gray-500 mt-1 text-sm">
+          <p className="text-slate-400 text-sm leading-relaxed">
             {food.description || "No description available"}
           </p>
 
-          <div className="space-y-1.5">
-            <p>
-              <strong>Quantity:</strong>{" "}
-              <span className="ml-1">{food.quantity}</span>
-            </p>
-            <p>
-          <b>Expiry :</b>{" "}
-          {food.expiry_time
-            ? formatToIST(food.expiry_time)
-            : "Not specified"}
-        </p>
-            <p>
-              <strong>Status:</strong>{" "}
-              <span className="ml-1 capitalize text-green-600">{food.status.charAt(0).toUpperCase() + food.status.slice(1)}</span>
-            </p>
+          <div className="space-y-2 pt-1">
+            <div className="flex items-center gap-2 text-sm text-slate-300">
+              <Package size={14} className="text-orange-400 flex-shrink-0" />
+              <span><span className="font-medium">Quantity:</span> {food.quantity}</span>
+            </div>
+            {food.city && (
+              <div className="flex items-center gap-2 text-sm text-slate-300">
+                <MapPin size={14} className="text-orange-400 flex-shrink-0" />
+                <span><span className="font-medium">City:</span> {food.city}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2 text-sm text-slate-300">
+              <Clock size={14} className="text-orange-400 flex-shrink-0" />
+              <span><span className="font-medium">Expires:</span> {formatToIST(food.expiry_time)}</span>
+            </div>
+            {food.address && (
+              <div className="flex items-start gap-2 text-sm text-slate-300">
+                <MapPin size={14} className="text-orange-400 flex-shrink-0 mt-0.5" />
+                <span><span className="font-medium">Pickup:</span> {food.address}</span>
+              </div>
+            )}
           </div>
-        </div>
 
-        {/* Actions */}
-        <div className="p-2 flex">
+          {/* Claim button */}
           <button
-            disabled={food.status !== "available"}
+            disabled={food.status !== "available" || !isVerified}
             onClick={handleClaim}
-            className="
-              flex-1
-              bg-[#7da30be6]
-              disabled:bg-gray-300
-              text-white
-              py-2.5
-              rounded-lg
-              font-medium
-              transition
-              cursor-pointer
-            "
+            className={`w-full mt-2 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white transition-all
+              disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed
+              ${isVerified ? "bg-gradient-to-r from-orange-500 to-orange-600 hover:shadow-lg hover:shadow-orange-500/30 hover:-translate-y-0.5 cursor-pointer" : ""}`}
           >
-            Claim
+            <CheckCircle2 size={16} />
+            {food.status !== "available" ? "Not Available" : !isVerified ? "Verify Account to Claim" : "Claim This Food"}
           </button>
         </div>
       </div>

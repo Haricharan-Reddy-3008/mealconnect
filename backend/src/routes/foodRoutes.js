@@ -1,114 +1,120 @@
 import express from "express";
-import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
-import { verifyRestaurantOwnership } from "../middlewares/foodMiddleware.js";
-import upload from "../middlewares/upload.js";
-import { createFood, getAllFood, claimFood, getNearbyFoods, markCollected, getFoodPostsByRestaurant, getClaimedFoodsByNGO } from "../controllers/foodController.js";
-import cloudinary from "../config/cloudinary.js";
-import { getIO } from "../socket/socketHandler.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
+import {
+  checkRoleVerified,
+  checkEmailVerified,
+  checkNotBanned,
+  onlyRestaurant,
+  onlyNGO,
+} from "../middlewares/verificationMiddleware.js";
+import { upload } from "../middlewares/upload.js";
+import { requireAdmin } from "../middlewares/adminMiddleware.js";
+import {
+  createFood,
+  getAllFood,
+  requestClaimFood,
+  markInTransit,
+  markCollected,
+  getFoodPostsByRestaurant,
+  getClaimedFoodPosts,
+  getNearbyFoods,
+  getFoodById,
+  deleteFood,
+  rejectClaim,
+  uploadDistributionProof,
+  getAdminFoodPosts,
+  getPendingClaimRequests,
+  approveClaimRequest,
+  rejectClaimRequestByAdmin,
+} from "../controllers/foodController.js";
 
 const router = express.Router();
 
+// Public routes
 router.get("/", getAllFood);
-router.get("/restaurant/:restaurantId", protect, getFoodPostsByRestaurant);
-router.get("/nearby", protect, getNearbyFoods); // requires coordinates in query or user profile
-// Create food post
-router.post("/createfood", upload.single("food_image"), protect, authorizeRoles("restaurant"), createFood);
-// Claimed food post
-router.patch("/:id/claim", protect, authorizeRoles("ngo"), claimFood);
-router.get("/claimed", protect, authorizeRoles("ngo"), getClaimedFoodsByNGO);
-// Collected food 
-router.patch("/:id/collected", protect, authorizeRoles("ngo"), markCollected);
+router.get("/mine/claimed", authMiddleware, checkNotBanned, onlyNGO, getClaimedFoodPosts);
+router.get("/admin/all", authMiddleware, requireAdmin("canViewAuditLogs"), getAdminFoodPosts);
+router.get("/admin/claim-requests", authMiddleware, requireAdmin(["canVerifyRestaurants", "canVerifyNGOs"]), getPendingClaimRequests);
+router.patch("/admin/claim-requests/:foodId/approve", authMiddleware, requireAdmin(["canVerifyRestaurants", "canVerifyNGOs"]), approveClaimRequest);
+router.patch("/admin/claim-requests/:foodId/reject", authMiddleware, requireAdmin(["canVerifyRestaurants", "canVerifyNGOs"]), rejectClaimRequestByAdmin);
 
-router.put(
-  "/food/:id",
-  protect,
-  verifyRestaurantOwnership,
+// Restaurant routes
+router.post(
+  "/createfood",
+  authMiddleware,
+  checkEmailVerified,
+  checkRoleVerified,
+  checkNotBanned,
+  onlyRestaurant,
   upload.single("food_image"),
-  async (req, res) => {
-    try {
-      const updates = req.body;
-
-      const allowedUpdates = [
-        "food_name",
-        "quantity",
-        "description",
-        "location",
-      ];
-
-      allowedUpdates.forEach((field) => {
-        if (updates[field] !== undefined) {
-          req.food[field] = updates[field];
-        }
-      });
-
-      if (updates.expiry_time) {
-        req.food.expiry_time = new Date(updates.expiry_time);
-      }
-
-      if (req.file) {
-        // delete old image from cloudinary
-        if (req.food.food_image?.[0]?.public_id) {
-          await cloudinary.uploader.destroy(
-            req.food.food_image[0].public_id
-          );
-        }
-
-        req.food.food_image = [
-          {
-            url: req.file.path,
-            public_id: req.file.filename,
-          },
-        ];
-      }
-
-      await req.food.save();
-
-
-      const io = getIO();
-        io.emit("post_updated", {
-          _id: req.food._id,
-          food_name: req.food.food_name,
-          quantity: req.food.quantity,
-          description: req.food.description,
-          expiry_time: req.food.expiry_time,
-          location: req.food.location,
-          food_image: req.food.food_image,
-          restaurantId: req.food.restaurantId,
-        });
-
-      res.json({
-        success: true,
-        message: "Food updated successfully",
-        food: req.food,
-      });
-
-    } catch (err) {
-      console.error("Update food error:", err);
-      res.status(500).json({
-        success: false,
-        message: err.message,
-      });
-    }
-  }
+  createFood,
+);
+router.get(
+  "/restaurant/:restaurantId",
+  authMiddleware,
+  getFoodPostsByRestaurant,
+);
+router.delete(
+  "/:id",
+  authMiddleware,
+  checkRoleVerified,
+  checkNotBanned,
+  onlyRestaurant,
+  deleteFood,
 );
 
-
-// Delete food post
-router.delete("/food/:id", protect, verifyRestaurantOwnership, async (req, res) => {
-  try {
-    const foodId = req.food._id;
-    await req.food.deleteOne();
-
-
-    const io = getIO();
-    io.emit("post_deleted", {
-      foodId: foodId.toString(),
-    });
-
-    res.json({ success: true, message: "Food post deleted" });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
+// NGO routes
+router.get(
+  "/nearby/search",
+  authMiddleware,
+  checkEmailVerified,
+  checkRoleVerified,
+  checkNotBanned,
+  onlyNGO,
+  getNearbyFoods,
+);
+router.patch(
+  "/:id/claim",
+  authMiddleware,
+  checkEmailVerified,
+  checkRoleVerified,
+  checkNotBanned,
+  onlyNGO,
+  requestClaimFood,
+);
+router.patch(
+  "/:foodId/in-transit",
+  authMiddleware,
+  checkRoleVerified,
+  checkNotBanned,
+  onlyRestaurant,
+  markInTransit,
+);
+router.patch(
+  "/:foodId/collected",
+  authMiddleware,
+  checkRoleVerified,
+  checkNotBanned,
+  onlyNGO,
+  markCollected,
+);
+router.get("/:id", getFoodById);
+router.post(
+  "/:foodId/distribution-proof",
+  authMiddleware,
+  checkEmailVerified,
+  checkRoleVerified,
+  checkNotBanned,
+  onlyNGO,
+  upload.array("photos", 5),
+  uploadDistributionProof,
+);
+router.patch(
+  "/:foodId/reject",
+  authMiddleware,
+  checkNotBanned,
+  onlyRestaurant,
+  rejectClaim,
+);
 
 export default router;

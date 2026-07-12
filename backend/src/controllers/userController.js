@@ -7,27 +7,25 @@ import foodPost from "../models/foodPost.js";
 export const updateProfile = async(req, res) => {
     try {
     const userId = req.user._id;
-    const { name, address, contactInfo } = req.body;
+    const { name, address, contactInfo, city } = req.body;
     const user = await User.findById(userId);
     if (!user) {
         return res.status(404).json({ message: "User not found" });
     }
-    if (name) {
-        user.name = name;
-    }
-    if (contactInfo) {
-        user.contactInfo = contactInfo;
-    }
+    if (name) user.name = name;
+    if (contactInfo) user.contactInfo = contactInfo;
+    if (city) user.city = city;
 
     if (contactInfo && !/^\d{10}$/.test(contactInfo)) {
         return res.status(400).json({ success: false, message: "Invalid contact number" });
     }
 
-    if (address && address !== user.address) {
-      user.address = address;
+    if ((address && address !== user.address) || (city && city !== user.city)) {
+      if (address) user.address = address;
       // geocode via Mapbox
       const token = process.env.MAPBOX_ACCESS_TOKEN;
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${token}&limit=1`;
+      const queryAddress = `${user.address}, ${user.city}`;
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(queryAddress)}.json?access_token=${token}&limit=1`;
       try {
             const geoRes = await axios.get(url);
             const feat = geoRes.data.features?.[0];
@@ -53,6 +51,7 @@ export const updateProfile = async(req, res) => {
     role: user.role,
     contactInfo: user.contactInfo,
     address: user.address,
+    city: user.city,
     location: user.location,
     avatar: user.avatar,
   }, 

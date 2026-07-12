@@ -27,7 +27,14 @@ export const verifyRestaurantOwnership = async (req, res, next) => {
       });
     }
 
-    if (food.restaurantId.toString() !== req.user._id.toString()) {
+    const userId = req.user._id?.toString() || req.user.id?.toString();
+    const foodOwnerId = food.restaurantId?.toString();
+
+    console.log("Verifying ownership for Food:", id);
+    console.log("Food Owner ID:", foodOwnerId);
+    console.log("Current User ID:", userId);
+
+    if (foodOwnerId !== userId) {
       return res.status(403).json({
         success: false,
         message: "Unauthorized: Not the owner",

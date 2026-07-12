@@ -1,117 +1,21 @@
 import toast from "react-hot-toast";
 import { collectFood } from "../api/food";
+import { Clock, Package, CheckCircle2, MapPin, ImagePlus, Star } from "lucide-react";
+import { useState } from "react";
+import DistributionProofModal from "./DistributionProofModal";
+import RatingModal from "./RatingModal";
 
-const ClaimedCard = ({ food = {}, refresh }) => {
-  const status = food.status || "available";
-
-  const statusColor = {
-    available: "text-green-600",
-    claimed: "text-yellow-600",
-    collected: "text-gray-500",
-    expired: "text-red-600",
+const labels = { claim_requested: "Pending Admin Approval", claimed: "Claimed", in_transit: "Pickup in progress", collected: "Collected" };
+export default function ClaimedCard({ food = {}, refresh }) {
+  const [proof, setProof] = useState(false); const [rating, setRating] = useState(false);
+  const collect = async () => { try { await collectFood(food._id); toast.success("Collection complete"); refresh(); } catch (e) { toast.error(e.response?.data?.message || "Collection failed"); } };
+  const restaurant = food.restaurantId;
+  const getButtonLabel = () => {
+    if (food.status === "claim_requested") return "Awaiting Admin Approval";
+    if (food.status === "claimed") return "Awaiting Restaurant Transit Start";
+    if (food.status === "collected") return "Collected";
+    if (food.status === "in_transit" && !food.distributionProof?.length) return "Upload photos to complete";
+    return "Mark as collected";
   };
-
-  const color = statusColor[status] || "text-gray-500";
-
-  const handleCollect = async () => {
-    try {
-      const res = await collectFood(food._id);
-      refresh();
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Registration failed");
-    }
-  };
-
-  const formatToIST = (iso) => {
-    if (!iso) return "";
-
-    const date = new Date(iso);
-
-    return date.toLocaleString("en-IN", {
-      timeZone: "Asia/Kolkata",
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
-  return (
-    <div className="
-      bg-white rounded-xl shadow-xl shadow-[#515739]
-      flex flex-col
-      overflow-hidden
-      w-full
-      max-w-sm
-      mx-auto
-    ">
-      {/* Image */}
-      <div className="w-full h-48 sm:h-52 md:h-56 overflow-hidden">
-        <img
-          className="w-full h-full object-cover"
-          src={
-            food.food_image?.[0]?.url ||
-            "https://via.placeholder.com/400x300?text=Food+Image"
-          }
-          alt={food.food_name || "Food image"}
-        />
-      </div>
-
-      {/* Content */}
-      <div className="flex flex-col py-4 sm:py-5 space-y-2 mx-3">
-        <h3 className="text-gray-900 text-2xl font-semibold">
-          {food.food_name || "Unnamed Food"}
-        </h3>
-
-        <p className="text-gray-500 text-sm">
-          {food.description || "No description"}
-        </p>
-
-        {/* Meta Info */}
-        <div className="space-y-1.5">
-          <p>
-            <b>Quantity :</b>{" "}
-            <span className="ml-1">{food.quantity || "Not specified"}</span>
-          </p>
-
-          <p>
-          <b>Expiry :</b>{" "}
-          {food.expiry_time
-            ? formatToIST(food.expiry_time)
-            : "Not specified"}
-        </p>
-
-          <p>
-            <b>Status :</b>{" "}
-            <span className={`ml-1 font-medium ${color}`}>
-              {food.status.charAt(0).toUpperCase() + food.status.slice(1)}
-            </span>
-          </p>
-        </div>
-
-        {/* Action */}
-        <button
-          disabled={food.status !== "claimed"}
-          onClick={handleCollect}
-          className="
-            w-full
-            bg-green-600
-            disabled:bg-gray-300
-            text-white
-            py-2.5
-            rounded-lg
-            font-medium
-            transition
-            cursor-pointer
-          "
-        >
-          Collect
-        </button>
-      </div>
-    </div>
-  );
-};
-
-export default ClaimedCard;
+  return <article className="bg-[#1e293b] border border-white/8 rounded-2xl overflow-hidden shadow-xl flex flex-col"><img className="h-44 w-full object-cover" src={food.food_image?.[0]?.url} alt={food.food_name}/><div className="p-4 flex-1"><div className="flex justify-between gap-3"><h3 className="text-white font-bold">{food.food_name}</h3><span className="text-[11px] text-sky-300">{labels[food.status] || food.status}</span></div><p className="text-slate-400 text-xs mt-2 line-clamp-2">{food.description}</p><div className="mt-3 text-xs text-slate-400 space-y-1"><p className="flex gap-1.5"><Package size={13} className="text-sky-400"/>{food.quantity}</p><p className="flex gap-1.5"><MapPin size={13} className="text-sky-400"/>{food.city}</p><p className="flex gap-1.5"><Clock size={13} className="text-sky-400"/>Expires {new Date(food.expiry_time).toLocaleString("en-IN")}</p></div>{restaurant && <div className="mt-3 border-t border-white/8 pt-3 text-xs text-slate-300"><span className="font-medium text-white">Restaurant: </span>{restaurant.name} {restaurant.verificationStatus === "verified" && <span className="text-emerald-400">• Verified</span>}</div>}{food.status === "in_transit" && !food.distributionProof?.length && <button onClick={() => setProof(true)} className="mt-3 w-full py-2.5 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-300 text-sm font-semibold flex justify-center gap-2"><ImagePlus size={15}/> Upload distribution photos</button>}<button disabled={food.status !== "in_transit" || !food.distributionProof?.length} onClick={collect} className="mt-3 w-full py-2.5 rounded-xl bg-sky-500 text-white text-sm font-semibold disabled:bg-slate-700 disabled:text-slate-500 flex justify-center gap-2"><CheckCircle2 size={15}/>{getButtonLabel()}</button>{food.status === "collected" && restaurant && <button onClick={() => setRating(true)} className="mt-2 w-full text-amber-300 text-sm flex justify-center gap-2"><Star size={15}/> Rate restaurant</button>}</div>{proof && <DistributionProofModal food={food} onClose={() => setProof(false)} onDone={refresh}/>} {rating && <RatingModal food={food} user={restaurant} onClose={() => setRating(false)} onDone={refresh}/>}</article>;
+}
