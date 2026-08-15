@@ -1,261 +1,351 @@
-# ResQFood — Real-Time Surplus Food Rescue Platform
+# 🍽️ MealConnect — Real-Time Food Donation Platform
 
-**ResQFood** is a full-stack web platform designed to **reduce food wastage and improve garbage management** by connecting **restaurants, hotels, and event organizers** with **NGOs** in **real time**.  
-The platform ensures that surplus food reaches people in need **before it expires**, instead of ending up in landfills.
+<div align="center">
 
-> **“No food should become waste when someone needs it.”**
+![MealConnect Banner](./Screenshots/Hero.png)
 
----
+**Connecting restaurants with surplus food to NGOs — in real time.**
 
-## 📌 Table of Contents
-1. Introduction  
-2. Problem Statement  
-3. Proposed Solution  
-4. Innovation & Uniqueness    
-5. Technology Stack  
-6. User Roles  
-7. Complete Workflow  
-8. Real-Time Features  
-9. Automatic Expiry System  
-10. Social Impact  
-11. Food Waste & Garbage Management  
-12. Feasibility & Scalability  
-13. Comparison with Existing Solutions  
-14. Future Scope  
-15. Conclusion  
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
+[![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com)
+[![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io)
+[![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+
+[▶️ Watch Demo Video](#-demo-video) · [✨ Features](#-features) · [🏗️ Architecture](#%EF%B8%8F-architecture) · [🚀 Getting Started](#-getting-started)
+
+</div>
 
 ---
 
-## 1️⃣ Introduction
+## 📌 The Problem
 
-Food wastage is one of the most critical global problems today.  
-While restaurants and events discard large quantities of edible food daily, NGOs and shelters often struggle to source food on time.
+> **40% of food produced in India is wasted** while millions go hungry every day.
 
-**ResQFood** bridges this gap using modern web technologies, real-time communication, and automation.  
-It transforms surplus food into a **resource**, not **garbage**.
+Restaurants, hotels, and event organizers discard large quantities of edible food daily due to lack of coordination. Meanwhile, NGOs and shelters struggle to source food on time. Manual donation systems are slow, unreliable, and have no accountability.
 
----
+## 💡 The Solution — MealConnect
 
-## 2️⃣ Problem Statement
+MealConnect is a **full-stack real-time platform** that bridges the gap between food surplus and food scarcity. It provides:
 
-### Current Challenges:
-- Surplus food is discarded due to lack of coordination
-- NGOs receive information too late
-- Manual donation systems are inefficient
-- Food mixed with garbage becomes unusable
-- No real-time tracking or expiry handling
-
-### Result:
-- Increased food waste
-- Higher landfill burden
-- Missed opportunities for social welfare
+- **Instant visibility** — Restaurants post surplus food; NGOs see it immediately
+- **Admin-mediated delivery** — Every handoff is verified to prevent fraud
+- **Email notifications** — Both parties stay informed at every step
+- **Live map** — NGOs discover food geographically with radius search
+- **Accountability** — Distribution proof uploads + star ratings build trust
 
 ---
 
-## 3️⃣ Proposed Solution — ResQFood
+## ▶️ Demo Video
 
-ResQFood provides a **real-time coordination platform** where:
-- Restaurants list surplus food with expiry time,quantity,food image
-- NGOs instantly view nearby available food on map
-- Food is claimed and collected efficiently in real time
-- Expired food is automatically removed via cron jobs
-
-The system focuses on **speed, safety, and accountability**.
+> 🎬 **[Watch the Full Walkthrough on YouTube →](#)**
+> *(Replace with your YouTube link after uploading)*
 
 ---
 
-## 4️⃣ Innovation & Uniqueness
+## ✨ Features
 
-ResQFood is **not just a listing platform** — it is a **coordination system**.
+### 🔐 Authentication & Security
+- JWT-based authentication with HTTP-only cookie sessions
+- Role-based access control (Restaurant / NGO / Admin)
+- Strong password enforcement with `validator.js`
+- Account lockout after 5 failed login attempts (30-minute cooldown)
+- Brute-force protection built into the login flow
 
-### Key Innovations:
-- ⚡ Real-time updates using WebSockets - Socket.io
-- ⏱️ Automatic expiry via background cron jobs - Inngest
-- 🔄 Live status synchronization across users
-- 🧠 Time-zone safe expiry handling
-- ♻️ Focus on food + garbage management together
-- 📧 Send Emails to NGOs & Restaurants on claiming and collecting food with live locations
+### 🍽️ Restaurant Features
+- Post surplus food with photo, quantity, description, pickup address & expiry time
+- Image uploads via **Cloudinary** CDN
+- Edit or delete food posts anytime
+- Real-time notifications when NGOs claim your food
+- View claim status updates (Pending → Claimed → In Transit → Collected)
 
----
+### 🤝 NGO Features
+- Browse available food donations in your city
+- **Interactive Map View** (Leaflet + OpenStreetMap) with adjustable radius (1–50 km)
+- Claim food with one click — request goes to admin for approval
+- Upload **distribution proof photos** after receiving food
+- Rate restaurants after successful collection (5-star system)
 
-## 5️⃣ Technology Stack
+### 🛡️ Admin Dashboard
+- **Organization Verification** — Approve/reject restaurant & NGO registrations
+- **Collection Request Management** — Mediate every delivery between restaurant and NGO
+- **All Food Listings** — Bird's-eye view of every donation with live status tracking
+- Full audit trail logging for compliance and accountability
 
-### 🌐 Frontend
-- React (Vite)
-- Tailwind CSS
-- Socket.IO Client
+### ⚡ Real-Time Engine (Socket.io)
+- New food posts appear instantly on NGO dashboards — no refresh needed
+- Status changes propagate across all connected clients in real time
+- Map View pins update live as restaurants post or food gets claimed
+- Toast notifications for claims, approvals, and collections
 
-### 🧠 Backend
-- Node.js
-- Express.js
-- Socket.IO
-- Inngest (cron jobs)
+### 📧 Email Notification Pipeline
+- **On Claim** → Both restaurant & NGO receive each other's contact details
+- **On Transit** → NGO gets notified: "Your food is on the way"
+- **On Collection** → Both parties receive confirmation emails
+- Powered by **Nodemailer** with SMTP integration
 
-### 🗄 Database & Storage
-- MongoDB Atlas
-- Cloudinary (Image Storage)
-
-### 🚀 Deployment
-- Frontend: Vercel  
-- Backend: Fly.io  
-- Database: MongoDB Atlas  
-
----
-
-## 6️⃣ User Roles
-
-### 🍴 Restaurant / Donor
-- Create food posts
-- Set expiry time
-- Receive claim & collection notifications via sockets
-- Receive claim & collection Email with google pickup location
-
-### 🤝 NGO / Collector
-- View nearby available food on real time map
-- Claim food in real time
-- Collect food before expiry
-- Receive claim & collection notifications via sockets
-- Receive claim & collection Email with google destination location
+### 🗺️ Map View (Leaflet + OpenStreetMap)
+- Free, no-API-key interactive map with CartoDB tiles
+- Custom animated food markers with pulse effects
+- NGO location beacon with radius circle overlay
+- Click any pin to view details and claim directly
+- City-based coordinate fallback for 20+ Indian cities
 
 ---
 
-## 7️⃣ Complete End-to-End Workflow
+## 🏗️ Architecture
 
-1. Restaurant creates a food post
-2. Food becomes instantly visible to NGOs in their map view
-3. NGO claims the food in real time
-4. Restaurant gets notified
-5. NGO collects food
-6. Restaurant gets notified
-7. Status updates in real time
-8. Unclaimed food expires automatically
-9. Expired Foods get deleted from database automatically after 7 days
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      MealConnect Flow                       │
+├─────────────┬───────────────────────┬───────────────────────┤
+│ Restaurant  │        Admin          │         NGO           │
+├─────────────┼───────────────────────┼───────────────────────┤
+│ Posts food  │                       │ Discovers on map/list │
+│     │       │                       │        │              │
+│     └───────┼── Visible instantly ──┼────────┘              │
+│             │                       │                       │
+│             │                       │ Claims food           │
+│             │  ← Approval request ──┤    │                  │
+│             │                       │    ▼                  │
+│             │  Approves/Rejects ────┤ Status: Claimed       │
+│             │                       │                       │
+│ Confirms    │                       │                       │
+│ pickup ─────┼───────────────────────┤ Status: In Transit    │
+│             │                       │    │                  │
+│             │                       │ Uploads proof photos  │
+│             │                       │ Marks collected       │
+│             │                       │    │                  │
+│             │                       │    ▼                  │
+│ Gets rated  │  Audit log updated    │ Rates restaurant ⭐   │
+└─────────────┴───────────────────────┴───────────────────────┘
 
----
-
-## 8️⃣ Real-Time Features
-
-- Live food availability updates on map
-- Instant notifications on claim & collection
-- No page refresh required
-- All users stay synchronized
-
----
-
-## 9️⃣ Automatic Expiry System (Core Feature)
-
-ResQFood uses **Inngest cron jobs** that:
-- Run periodically in the background
-- Check food expiry times
-- Mark expired food as expired
-- Prevent unsafe food distribution
-- Update UI instantly via sockets
-
-This ensures **food safety and reliability**.
+📧 Email notifications sent at: Claim → Transit → Collection
+⚡ Socket.io real-time updates at every status change
+```
 
 ---
 
-## 🔟 Social Impact
+## 🛠️ Tech Stack
 
-### 🥗 Hunger Reduction
-- Faster access to food for NGOs
-- Reduced dependency on delayed donations
-
-### 🌍 Sustainability
-- Responsible food usage
-- Environment-friendly system
-
----
-
-## 1️⃣1️⃣ How ResQFood Reduces Food & Garbage Waste
-
-- Prevents food from being discarded
-- Encourages timely redistribution
-- Stops expired food from entering supply
-- Reduces overall garbage volume
-- Promotes sustainable practices
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 19, Vite, Tailwind CSS 4, Leaflet, Socket.io Client, Lucide Icons, Framer Motion |
+| **Backend** | Node.js, Express.js, Socket.io, Inngest (cron jobs), Nodemailer |
+| **Database** | MongoDB with Mongoose ODM |
+| **Storage** | Cloudinary (food images, avatars, distribution proof) |
+| **Auth** | JWT + HTTP-only cookies, bcrypt password hashing |
+| **Maps** | Leaflet + OpenStreetMap / CartoDB tiles (free, no API key) |
+| **Validation** | express-validator, validator.js |
 
 ---
 
-## 1️⃣2️⃣ Feasibility & Scalability
+## 📸 Screenshots
 
-### Why ResQFood is practical:
-- No special hardware needed
-- Cloud-based scalable infrastructure
-- Can be adopted city-wise or nationally
-
----
-
-## 1️⃣3️⃣ Comparison with Existing Surplus Food Apps
-
-|         Feature         | ResQFood | Traditional Apps |
-|-------------------------|----------|------------------|
-| Real-time updates       |    ✅    |        ❌       |
-| Auto expiry             |    ✅    |        ❌       |
-| WebSocket alerts        |    ✅    |        ❌       |
-| NGO-focused flow        |    ✅    |        ❌       |
-| Garbage reduction logic |    ✅    |        ❌       |
-
----
-
-## 1️⃣4️⃣ Future Scope
-
-- 📱 Mobile application
-- 🚚 Pickup route optimization
-- 📊 Food waste analytics
-- 🧠 AI demand prediction
-- 🏛️ Government & municipality integration
-- 🏆 Reward system for donors
-
----
-
-## 1️⃣5️⃣ Conclusion
-
-ResQFood demonstrates how **technology, automation, and social responsibility** can work together to solve a real-world problem.
-
-It is not just a hackathon prototype —  
-it is a **scalable, impactful, and sustainable solution** for food waste and social welfare.
-
----
-
-### Home Page
+### 🏠 Home Page
 ![Home Page](./Screenshots/Hero.png)
 
-### Features Section
-![Features Section](./Screenshots/Features.png)
-
-### Testimonials Section
-![Testimonials Section](./Screenshots/Testimonials.png)
-
-### Sign Up Page
+### 📝 Sign Up — Role Selection
 ![Sign Up Page](./Screenshots/Signup.png)
 
-### Log In Page
-![Log In Page](./Screenshots/Login.png)
+### 🔐 Login
+![Login Page](./Screenshots/Login.png)
 
-### Edit Profile Page
-![Edit Profile Page](./Screenshots/EditProfile.png)
+### 🍽️ Restaurant Dashboard
+![Restaurant Dashboard](./Screenshots/RestaurantDashboard.png)
 
-### Restaurant Dashboard Page
-![Restaurant Dashboard Page](./Screenshots/RestaurantDashboard.png)
+### ✏️ Edit Profile
+![Edit Profile](./Screenshots/EditProfile.png)
 
-### NGO Mapview Page
-![NGO Mapview Page](./Screenshots/NGOMapview.png)
+### 🤝 NGO Dashboard
+![NGO Dashboard](./Screenshots/NGODashboard.png)
 
-### Food Marker on Map
-![Food Marker on Map](./Screenshots/FoodMarker.png)
+### 🗺️ Interactive Map View
+![Map View](./Screenshots/NGOMapview.png)
 
-### Food Modal on Map for claiming
-![Food Modal on Map for claiming](./Screenshots/FoodClaimModal.png)
+### 📍 Food Marker on Map
+![Food Marker](./Screenshots/FoodMarker.png)
 
-### NGO Dashboard Page
-![NGO Dashboard Page](./Screenshots/Socket.png)
+### 🍲 Food Claim Modal
+![Claim Modal](./Screenshots/FoodClaimModal.png)
 
-Built with ❤️ for society and sustainability  
+### ⚡ Real-Time Socket Updates
+![Socket Updates](./Screenshots/Socket.png)
+
+### ✨ Features Section
+![Features](./Screenshots/Features.png)
+
+### 💬 Testimonials
+![Testimonials](./Screenshots/Testimonials.png)
 
 ---
 
-## ⭐ Support
+## 🚀 Getting Started
 
-If you believe in reducing food waste and creating impact,  
-**star this repository ⭐**
+### Prerequisites
+- **Node.js** v18+
+- **MongoDB** (local or Atlas)
+- **Git**
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/Haricharan-Reddy-3008/mealconnect.git
+cd mealconnect
+```
+
+### 2. Setup Backend
+```bash
+cd backend
+npm install
+```
+
+Create a `.env` file in `/backend`:
+```env
+PORT=5000
+MONGO_URI=mongodb://127.0.0.1:27017/food_donation
+JWT_SECRET=your_jwt_secret_here
+FRONTEND_URL=http://localhost:5173
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+EMAIL_FROM=your_email@gmail.com
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+Start the backend:
+```bash
+npm start
+```
+
+### 3. Setup Frontend
+```bash
+cd ../frontend
+npm install
+```
+
+Create a `.env` file in `/frontend`:
+```env
+VITE_API_URL=http://localhost:5000
+VITE_SOCKET_URL=http://localhost:5000
+```
+
+Start the frontend:
+```bash
+npm run dev
+```
+
+### 4. Open in browser
+```
+http://localhost:5173
+```
+
+---
+
+## 📁 Project Structure
+
+```
+mealconnect/
+├── backend/
+│   ├── server.js              # Entry point + MongoDB + Socket.io
+│   └── src/
+│       ├── app.js             # Express app, CORS, routes
+│       ├── config/            # Database configuration
+│       ├── controllers/       # Auth, Food, User, Verification logic
+│       ├── middlewares/       # JWT auth, role guards, file upload
+│       ├── models/            # User, FoodPost, Rating, AuditLog, Admin
+│       ├── routes/            # API endpoints
+│       ├── socket/            # Socket.io event handlers
+│       ├── inngest/           # Background cron jobs (auto-expiry)
+│       └── utils/             # Email templates, Cloudinary helpers
+├── frontend/
+│   └── src/
+│       ├── api/               # Axios instance + API helpers
+│       ├── components/        # Navbar, FoodCard, Modals, Footer, etc.
+│       ├── context/           # AuthContext (React Context API)
+│       ├── pages/             # Home, Login, Signup, Dashboards, MapView
+│       ├── route/             # Protected & Auth route wrappers
+│       └── socket/            # Socket.io client connection
+└── Screenshots/               # App screenshots for README
+```
+
+---
+
+## 🔄 Complete Donation Lifecycle
+
+```
+1. 🍽️  Restaurant posts surplus food (photo + details + expiry)
+2. ⚡  NGOs see it instantly on dashboard & map (via Socket.io)
+3. 🤝  NGO clicks "Claim" → Request sent to Admin
+4. 📧  Both restaurant & NGO receive email with contact details
+5. 🛡️  Admin reviews and approves the claim
+6. 🚗  Restaurant confirms pickup → Status: "In Transit"
+7. 📧  NGO receives "food is on the way" email
+8. 📸  NGO uploads distribution proof photos
+9. ✅  NGO marks food as "Collected"
+10. 📧 Both receive collection confirmation emails
+11. ⭐  NGO rates the restaurant (5-star + optional review)
+12. ⏰  Unclaimed food auto-expires via Inngest cron jobs
+```
+
+---
+
+## 🌟 What Makes MealConnect Different
+
+| Feature | MealConnect | Traditional Apps |
+|---------|:-----------:|:----------------:|
+| Real-time updates (WebSockets) | ✅ | ❌ |
+| Admin-mediated delivery pipeline | ✅ | ❌ |
+| Email notifications at every step | ✅ | ❌ |
+| Interactive map with radius search | ✅ | ❌ |
+| Distribution proof uploads | ✅ | ❌ |
+| Automatic food expiry (cron) | ✅ | ❌ |
+| Trust ratings system | ✅ | ❌ |
+| Organization verification | ✅ | ❌ |
+
+---
+
+## 🔮 Future Scope
+
+- 📱 Mobile application (React Native)
+- 🚚 Pickup route optimization with Google Maps
+- 📊 Food waste analytics dashboard
+- 🧠 AI-powered demand prediction
+- 🏛️ Government & municipality integration
+- 🏆 Gamified reward system for frequent donors
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to open issues or submit pull requests.
+
+```bash
+# Fork the repo, create a feature branch
+git checkout -b feature/amazing-feature
+
+# Commit your changes
+git commit -m "Add amazing feature"
+
+# Push and create a PR
+git push origin feature/amazing-feature
+```
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+<div align="center">
+
+**Built with ❤️ to reduce food waste and feed communities**
+
+⭐ **Star this repo if you believe in reducing food waste!** ⭐
+
+</div>
