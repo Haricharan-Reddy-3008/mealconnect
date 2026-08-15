@@ -224,15 +224,5 @@ frontend/
 
 ---
 
-## Things I'd add next
 
-- Push notifications (service workers) so NGOs get alerted even when the tab is closed
-- Route optimization — suggest the fastest pickup path when multiple claims exist
-- Analytics dashboard showing waste reduction metrics over time
-- Mobile app (React Native) for on-the-go restaurant managers
 
----
-
-<div align="center">
-  <sub>If you think food shouldn't go to waste — ⭐ this repo.</sub>
-</div>
