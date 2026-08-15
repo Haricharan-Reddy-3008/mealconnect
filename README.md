@@ -95,34 +95,6 @@ Every step triggers **Socket.io events** (so dashboards update without refresh) 
 ---
 
 
----
-
-## Screenshots
-
-<table>
-<tr>
-<td width="50%"><strong>🔐 Login</strong><br/><img src="./Screenshots/Login.png" width="100%"/></td>
-<td width="50%"><strong>📝 Sign Up</strong><br/><img src="./Screenshots/Signup.png" width="100%"/></td>
-</tr>
-<tr>
-<td><strong>🍽️ Restaurant Dashboard</strong><br/><img src="./Screenshots/RestaurantDashboard.png" width="100%"/></td>
-<td><strong>🤝 NGO Dashboard</strong><br/><img src="./Screenshots/NGODashboard.png" width="100%"/></td>
-</tr>
-<tr>
-<td><strong>🗺️ Map View</strong><br/><img src="./Screenshots/NGOMapview.png" width="100%"/></td>
-<td><strong>📍 Food Pin on Map</strong><br/><img src="./Screenshots/FoodMarker.png" width="100%"/></td>
-</tr>
-<tr>
-<td><strong>🍲 Claim Modal</strong><br/><img src="./Screenshots/FoodClaimModal.png" width="100%"/></td>
-<td><strong>⚡ Real-Time Updates</strong><br/><img src="./Screenshots/Socket.png" width="100%"/></td>
-</tr>
-<tr>
-<td><strong>✏️ Edit Profile</strong><br/><img src="./Screenshots/EditProfile.png" width="100%"/></td>
-<td><strong>✨ Features</strong><br/><img src="./Screenshots/Features.png" width="100%"/></td>
-</tr>
-</table>
-
----
 
 ## Technical decisions I made
 
