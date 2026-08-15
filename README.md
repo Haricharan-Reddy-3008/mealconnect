@@ -1,8 +1,6 @@
 # 🍽️ MealConnect — Real-Time Food Donation Platform
 
-<div align="center">
 
-![MealConnect Banner](./Screenshots/Hero.png)
 
 **Connecting restaurants with surplus food to NGOs — in real time.**
 
@@ -37,10 +35,6 @@ MealConnect is a **full-stack real-time platform** that bridges the gap between 
 
 ---
 
-## ▶️ Demo Video
-
-> 🎬 **[Watch the Full Walkthrough on YouTube →](#)**
-> *(Replace with your YouTube link after uploading)*
 
 ---
 
@@ -141,43 +135,6 @@ MealConnect is a **full-stack real-time platform** that bridges the gap between 
 
 ---
 
-## 📸 Screenshots
-
-### 🏠 Home Page
-![Home Page](./Screenshots/Hero.png)
-
-### 📝 Sign Up — Role Selection
-![Sign Up Page](./Screenshots/Signup.png)
-
-### 🔐 Login
-![Login Page](./Screenshots/Login.png)
-
-### 🍽️ Restaurant Dashboard
-![Restaurant Dashboard](./Screenshots/RestaurantDashboard.png)
-
-### ✏️ Edit Profile
-![Edit Profile](./Screenshots/EditProfile.png)
-
-### 🤝 NGO Dashboard
-![NGO Dashboard](./Screenshots/NGODashboard.png)
-
-### 🗺️ Interactive Map View
-![Map View](./Screenshots/NGOMapview.png)
-
-### 📍 Food Marker on Map
-![Food Marker](./Screenshots/FoodMarker.png)
-
-### 🍲 Food Claim Modal
-![Claim Modal](./Screenshots/FoodClaimModal.png)
-
-### ⚡ Real-Time Socket Updates
-![Socket Updates](./Screenshots/Socket.png)
-
-### ✨ Features Section
-![Features](./Screenshots/Features.png)
-
-### 💬 Testimonials
-![Testimonials](./Screenshots/Testimonials.png)
 
 ---
 
