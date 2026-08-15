@@ -1,14 +1,18 @@
-<div align="center">
-  <img src="./Screenshots/Hero.png" alt="MealConnect" width="100%" />
-  <br/><br/>
-  <p><strong>A platform where leftover food finds a purpose — not a landfill.</strong></p>
-  <p>
-    <img src="https://img.shields.io/badge/react-19-blue?logo=react" />
-    <img src="https://img.shields.io/badge/node.js-express-green?logo=nodedotjs" />
-    <img src="https://img.shields.io/badge/mongodb-mongoose-brightgreen?logo=mongodb" />
-    <img src="https://img.shields.io/badge/socket.io-realtime-black?logo=socketdotio" />
-    <img src="https://img.shields.io/badge/leaflet-maps-199900?logo=leaflet" />
-  </p>
+# 🍽️ MealConnect — Real-Time Food Donation Platform
+
+
+
+**Connecting restaurants with surplus food to NGOs — in real time.**
+
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
+[![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com)
+[![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io)
+[![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+
+[▶️ Watch Demo Video](#-demo-video) · [✨ Features](#-features) · [🏗️ Architecture](#%EF%B8%8F-architecture) · [🚀 Getting Started](#-getting-started)
+
 </div>
 
 ---
@@ -19,9 +23,60 @@ MealConnect lets **restaurants** list surplus food before it expires, **NGOs** d
 
 ---
 
-## How the delivery works
 
-This isn't a simple listing board. There's a **5-step admin-mediated pipeline** behind every donation:
+---
+
+## ✨ Features
+
+### 🔐 Authentication & Security
+- JWT-based authentication with HTTP-only cookie sessions
+- Role-based access control (Restaurant / NGO / Admin)
+- Strong password enforcement with `validator.js`
+- Account lockout after 5 failed login attempts (30-minute cooldown)
+- Brute-force protection built into the login flow
+
+### 🍽️ Restaurant Features
+- Post surplus food with photo, quantity, description, pickup address & expiry time
+- Image uploads via **Cloudinary** CDN
+- Edit or delete food posts anytime
+- Real-time notifications when NGOs claim your food
+- View claim status updates (Pending → Claimed → In Transit → Collected)
+
+### 🤝 NGO Features
+- Browse available food donations in your city
+- **Interactive Map View** (Leaflet + OpenStreetMap) with adjustable radius (1–50 km)
+- Claim food with one click — request goes to admin for approval
+- Upload **distribution proof photos** after receiving food
+- Rate restaurants after successful collection (5-star system)
+
+### 🛡️ Admin Dashboard
+- **Organization Verification** — Approve/reject restaurant & NGO registrations
+- **Collection Request Management** — Mediate every delivery between restaurant and NGO
+- **All Food Listings** — Bird's-eye view of every donation with live status tracking
+- Full audit trail logging for compliance and accountability
+
+### ⚡ Real-Time Engine (Socket.io)
+- New food posts appear instantly on NGO dashboards — no refresh needed
+- Status changes propagate across all connected clients in real time
+- Map View pins update live as restaurants post or food gets claimed
+- Toast notifications for claims, approvals, and collections
+
+### 📧 Email Notification Pipeline
+- **On Claim** → Both restaurant & NGO receive each other's contact details
+- **On Transit** → NGO gets notified: "Your food is on the way"
+- **On Collection** → Both parties receive confirmation emails
+- Powered by **Nodemailer** with SMTP integration
+
+### 🗺️ Map View (Leaflet + OpenStreetMap)
+- Free, no-API-key interactive map with CartoDB tiles
+- Custom animated food markers with pulse effects
+- NGO location beacon with radius circle overlay
+- Click any pin to view details and claim directly
+- City-based coordinate fallback for 20+ Indian cities
+
+---
+
+## 🏗️ Architecture
 
 ```
 Restaurant posts food
@@ -39,28 +94,6 @@ Every step triggers **Socket.io events** (so dashboards update without refresh) 
 
 ---
 
-## The three roles
-
-### Restaurant
-| What they do | How it works |
-|---|---|
-| Post surplus food | Upload photo via Cloudinary, set quantity, expiry, pickup address |
-| Track claims | See who claimed, approve/reject, mark as "in transit" |
-| Get rated | NGOs leave 5-star ratings after collection |
-
-### NGO
-| What they do | How it works |
-|---|---|
-| Browse nearby food | City-filtered list + interactive Leaflet map with 1–50 km radius slider |
-| Claim food | One-click claim → goes to admin for approval |
-| Prove distribution | Upload photos of food being handed out before marking "collected" |
-
-### Admin
-| What they do | How it works |
-|---|---|
-| Verify organizations | Review registration docs, approve/reject restaurants & NGOs |
-| Manage deliveries | Approve or reject every claim request — full middleman control |
-| Monitor everything | See all food posts, statuses, quantities, timestamps in one table |
 
 ---
 
